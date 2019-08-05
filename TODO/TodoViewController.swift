@@ -10,11 +10,13 @@ import UIKit
 
 class TodoViewController: UITableViewController {
     
-    var ittemArray = [String]()
+    var ittemArray = [Item]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        
+        
     }
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
@@ -24,8 +26,10 @@ class TodoViewController: UITableViewController {
         
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             
-            self.ittemArray.append(textField.text!)
+            let newItem = Item()
+            newItem.title = textField.text!
             
+            self.ittemArray.append(newItem)
             self.tableView.reloadData()
         }
         
@@ -49,19 +53,24 @@ class TodoViewController: UITableViewController {
         
         let cell = UITableViewCell(style: .default, reuseIdentifier: "ToDoItemCell")
         
-        cell.textLabel?.text = ittemArray[indexPath.row]
+        let item = ittemArray[indexPath.row]
+        
+        cell.textLabel?.text = item.title
+        
+        if item.done == true {
+            cell.accessoryType = .checkmark
+        } else {
+            cell.accessoryType = .none
+        }
         
         return cell
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
-        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-            tableView.cellForRow(at: indexPath)?.accessoryType = .none
-        } else {
-        tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
-        }
+        ittemArray[indexPath.row].done = !ittemArray[indexPath.row].done
         
+        tableView.reloadData()
         tableView.deselectRow(at: indexPath, animated: true)
     }
 
