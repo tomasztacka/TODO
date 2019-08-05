@@ -10,11 +10,33 @@ import UIKit
 
 class TodoViewController: UITableViewController {
     
-    let ittemArray = [String]()
+    var ittemArray = [String]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
+    }
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        
+        var textField = UITextField()
+        
+        let alert = UIAlertController(title: "Add new Item", message: "", preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
+            
+            self.ittemArray.append(textField.text!)
+            
+            self.tableView.reloadData()
+        }
+        
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Your new Item"
+            textField = alertTextField
+        }
+        
+        alert.addAction(action)
+        
+        present(alert, animated: true, completion: nil)
     }
     
     // MARK TableView
