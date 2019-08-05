@@ -29,7 +29,11 @@ class TodoViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             let newItem = Item()
             newItem.title = textField.text!
+            if newItem.title.isEmpty {
+                print("You try add empty String")
+            } else {
             self.ittemArray.append(newItem)
+            }
             self.saveItems()
         }
         
@@ -118,7 +122,13 @@ extension TodoViewController: SwipeTableViewCellDelegate {
             let action = UIAlertAction(title: "Change Item", style: .default) { (action) in
                 let editItem = Item()
                 editItem.title = textField.text!
-                self.ittemArray[indexPath.row].title = editItem.title
+                
+                if editItem.title.isEmpty {
+                    //print("You try add empty String")
+                    return
+                } else {
+                    self.ittemArray[indexPath.row].title = editItem.title
+                }
                 self.saveItems()
             }
             self.tableView.reloadData()
