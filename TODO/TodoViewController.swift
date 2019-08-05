@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import SwipeCellKit
 
 class TodoViewController: UITableViewController {
     
@@ -16,9 +17,11 @@ class TodoViewController: UITableViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        //print(dataFilePath)
         loadItems()
-        
+        tableView.rowHeight = 88.0
     }
+    
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
         var textField = UITextField()
@@ -26,13 +29,9 @@ class TodoViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
             let newItem = Item()
             newItem.title = textField.text!
-            
             self.ittemArray.append(newItem)
-            
             self.saveItems()
         }
-    
-        
         
         self.tableView.reloadData()
         
@@ -48,7 +47,6 @@ class TodoViewController: UITableViewController {
     
     func saveItems() {
         let encoder = PropertyListEncoder()
-        
         do {
             let data = try encoder.encode(ittemArray)
             try data.write(to: dataFilePath!)
@@ -72,16 +70,25 @@ class TodoViewController: UITableViewController {
     // MARK TableView
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        
         return ittemArray.count
+        
     }
     
+//    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! SwipeTableViewCell
+//        cell.delegate = self
+//        return cell
+//    }
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        //let cell = UITableViewCell(style: .default, reuseIdentifier: "ToDoItemCell")
         
-        let cell = UITableViewCell(style: .default, reuseIdentifier: "ToDoItemCell")
+        let cell = tableView.dequeueReusableCell(withIdentifier: "ToDoItemCell", for: indexPath) as! SwipeTableViewCell
         
         let item = ittemArray[indexPath.row]
-        
         cell.textLabel?.text = item.title
+        cell.delegate = self
         
         if item.done == true {
             cell.accessoryType = .checkmark
@@ -93,12 +100,29 @@ class TodoViewController: UITableViewController {
     }
 
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        
         ittemArray[indexPath.row].done = !ittemArray[indexPath.row].done
         saveItems()
         tableView.deselectRow(at: indexPath, animated: true)
-
     }
-
 }
 
+    // MARK Swipe Cell Kit Delegate Methods
+
+extension TodoViewController: SwipeTableViewCellDelegate {
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        guard orientation == .right else { return nil }
+        
+        let editAction = SwipeAction(style: .default, title: "Edit") { action, indexPath in
+            // handle action by updating model with deletion
+            print("Edit")
+            
+
+              
+        }
+        
+        // customize the action appearance
+        editAction.image = UIImage(named: "Disclosure")
+        
+        return [editAction]
+    }
+}
