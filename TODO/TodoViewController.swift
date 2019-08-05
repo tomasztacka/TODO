@@ -75,12 +75,6 @@ class TodoViewController: UITableViewController {
         
     }
     
-//    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! SwipeTableViewCell
-//        cell.delegate = self
-//        return cell
-//    }
-    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         //let cell = UITableViewCell(style: .default, reuseIdentifier: "ToDoItemCell")
         
@@ -116,7 +110,25 @@ extension TodoViewController: SwipeTableViewCellDelegate {
             // handle action by updating model with deletion
             print("Edit")
             
-
+            //var textField = UITextField()
+            let item = self.ittemArray[indexPath.row].title
+            
+            var textField = UITextField()
+            let alert = UIAlertController(title: "\(item)", message: "", preferredStyle: .alert)
+            let action = UIAlertAction(title: "Change Item", style: .default) { (action) in
+                let editItem = Item()
+                editItem.title = textField.text!
+                self.ittemArray[indexPath.row].title = editItem.title
+                self.saveItems()
+            }
+            self.tableView.reloadData()
+            
+            alert.addTextField { (alertTextField) in
+                alertTextField.text = item
+                textField = alertTextField
+            }
+            alert.addAction(action)
+            self.present(alert, animated: true, completion: nil)
               
         }
         
