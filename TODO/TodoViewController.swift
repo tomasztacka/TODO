@@ -12,35 +12,61 @@ class TodoViewController: UITableViewController {
     
     var ittemArray = [Item]()
     
+    let dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("Item.plist")
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        
+        loadItems()
         
     }
     @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
         
         var textField = UITextField()
-        
         let alert = UIAlertController(title: "Add new Item", message: "", preferredStyle: .alert)
-        
         let action = UIAlertAction(title: "Add Item", style: .default) { (action) in
-            
             let newItem = Item()
             newItem.title = textField.text!
             
             self.ittemArray.append(newItem)
-            self.tableView.reloadData()
+            
+            self.saveItems()
         }
+    
+        
+        
+        self.tableView.reloadData()
         
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Your new Item"
             textField = alertTextField
         }
-        
         alert.addAction(action)
-        
         present(alert, animated: true, completion: nil)
+    }
+    
+    // Model
+    
+    func saveItems() {
+        let encoder = PropertyListEncoder()
+        
+        do {
+            let data = try encoder.encode(ittemArray)
+            try data.write(to: dataFilePath!)
+        } catch {
+            print("Error encoding ittem array: \(error)")
+        }
+        self.tableView.reloadData()
+    }
+    
+    func loadItems() {
+        if let data = try? Data(contentsOf: dataFilePath!) {
+            let decoder = PropertyListDecoder()
+            do {
+                ittemArray = try decoder.decode([Item].self, from: data)
+            } catch {
+                print("Error decoding item array, \(error)")
+            }
+        }
     }
     
     // MARK TableView
@@ -69,9 +95,9 @@ class TodoViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         
         ittemArray[indexPath.row].done = !ittemArray[indexPath.row].done
-        
-        tableView.reloadData()
+        saveItems()
         tableView.deselectRow(at: indexPath, animated: true)
+
     }
 
 }
